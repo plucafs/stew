@@ -41,6 +41,7 @@
 * Just a single binary with 0 dependencies.
 * Portable [`Stewfile`](https://github.com/marwanhawari/stew/blob/main/examples/Stewfile) with optional pinned versioning.
 * Headless batch installs from a [`Stewfile.lock.json`](https://github.com/marwanhawari/stew/blob/main/examples/Stewfile.lock.json) file.
+* Optional [`.desktop` file](https://github.com/marwanhawari/stew?tab=readme-ov-file#desktop-files-linux) for launching installed binaries from a Linux application menu.
 
 ![demo](https://github.com/marwanhawari/stew/raw/main/assets/demo.gif)
 
@@ -155,6 +156,13 @@ stew list --tags > Stewfile            # Pin tags
 # Configure the stew file paths using an interactive UI
 stew config           # Automatically updates the stew.config.json
 ```
+
+# Desktop files (Linux)
+On Linux, `stew install` will ask if you want to create a `.desktop` file for the installed binary so it can be launched from your desktop's application menu. The file is written to `$XDG_DATA_HOME/applications` or `~/.local/share/applications` and is named `stew-<binary>.desktop`.
+
+* The desktop file is tracked in `Stewfile.lock.json`, so `stew uninstall` deletes it and `stew rename` updates its `Name` and `Exec` values.
+* `stew` never overwrites an existing `.desktop` file: manual edits like a custom `Icon=` value are preserved. Reinstalling an installed binary leaves the file untouched, so delete it yourself if you want to be prompted again.
+* The prompt is skipped entirely in non-interactive runs, like CI or piped installs.
 
 # Configuration
 `stew` can be configured with a `stew.config.json` file. The location of this file will also depend on your OS:

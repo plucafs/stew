@@ -29,15 +29,19 @@ func List(cliTagsFlag bool) {
 	}
 
 	for _, pkg := range lockFile.Packages {
+		desktopMarker := ""
+		if pkg.DesktopFile != "" {
+			desktopMarker = " " + constants.YellowColor("[desktop]")
+		}
 		switch pkg.Source {
 		case "other":
-			fmt.Println(constants.GreenColor(pkg.Binary+":") + pkg.URL)
+			fmt.Println(constants.GreenColor(pkg.Binary+":") + pkg.URL + desktopMarker)
 		case "github":
 			defaultLine := constants.GreenColor(pkg.Binary+":") + pkg.Owner + "/" + pkg.Repo
 			if cliTagsFlag {
-				fmt.Println(defaultLine + "@" + pkg.Tag)
+				fmt.Println(defaultLine + "@" + pkg.Tag + desktopMarker)
 			} else {
-				fmt.Println(defaultLine)
+				fmt.Println(defaultLine + desktopMarker)
 			}
 		}
 	}

@@ -30,6 +30,8 @@ func Rename(cliInput string) {
 
 	var binaryFound bool
 	var renamedBinaryName string
+	var indexInLockFile int
+	var desktopFileName string
 	for index, pkg := range lockFile.Packages {
 		if pkg.Binary == cliInput {
 			renamedBinaryName, err = stew.PromptRenameBinary(cliInput)
@@ -38,12 +40,21 @@ func Rename(cliInput string) {
 			stew.CatchAndExit(err)
 
 			lockFile.Packages[index].Binary = renamedBinaryName
+			indexInLockFile = index
+			desktopFileName = pkg.DesktopFile
 			binaryFound = true
 			break
 		}
 	}
 	if !binaryFound {
 		stew.CatchAndExit(stew.BinaryNotInstalledError{Binary: cliInput})
+	}
+
+	newDesktopFileName, err := stew.RenameDesktopFile(desktopFileName, renamedBinaryName, filepath.Join(stewBinPath, renamedBinaryName))
+	if err != nil {
+		fmt.Printf("%v Could not update the desktop file for %v: %v\n", constants.YellowColor("WARNING:"), constants.YellowColor(cliInput), err)
+	} else {
+		lockFile.Packages[indexInLockFile].DesktopFile = newDesktopFileName
 	}
 
 	err = stew.WriteLockFileJSON(lockFile, stewLockFilePath)

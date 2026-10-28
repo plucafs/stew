@@ -22,14 +22,15 @@ type LockFile struct {
 
 // PackageData contains the information for an installed binary
 type PackageData struct {
-	Source     string `json:"source"`
-	Owner      string `json:"owner"`
-	Repo       string `json:"repo"`
-	Tag        string `json:"tag"`
-	Asset      string `json:"asset"`
-	Binary     string `json:"binary"`
-	URL        string `json:"url"`
-	BinaryHash string `json:"binaryHash"`
+	Source      string `json:"source"`
+	Owner       string `json:"owner"`
+	Repo        string `json:"repo"`
+	Tag         string `json:"tag"`
+	Asset       string `json:"asset"`
+	Binary      string `json:"binary"`
+	URL         string `json:"url"`
+	BinaryHash  string `json:"binaryHash"`
+	DesktopFile string `json:"desktopFile,omitempty"`
 }
 
 func ReadLockFileJSON(lockFilePath string) (LockFile, error) {

@@ -59,6 +59,13 @@ func installOne(pkg stew.PackageData, userOS, userArch string, systemInfo stew.S
 		return err
 	}
 
+	existingDesktopFiles := map[string]string{}
+	for _, existingPkg := range lockFile.Packages {
+		if existingPkg.DesktopFile != "" {
+			existingDesktopFiles[existingPkg.Binary] = existingPkg.DesktopFile
+		}
+	}
+
 	if err = os.RemoveAll(stewTmpPath); err != nil {
 		return err
 	}
@@ -164,6 +171,23 @@ func installOne(pkg stew.PackageData, userOS, userArch string, systemInfo stew.S
 			URL:        downloadURL,
 			BinaryHash: binaryHash,
 		}
+	}
+
+	packageData.DesktopFile = existingDesktopFiles[binaryName]
+
+	var getDesktopComment func() string
+	if source == "github" {
+		getDesktopComment = func() string {
+			return stew.GetGithubRepoDescription(owner, repo)
+		}
+	} else {
+		getDesktopComment = func() string {
+			return ""
+		}
+	}
+	newDesktopFile, desktopFileExists := stew.SetupDesktopFile(binaryName, filepath.Join(stewBinPath, binaryName), getDesktopComment)
+	if !desktopFileExists && newDesktopFile != "" {
+		packageData.DesktopFile = newDesktopFile
 	}
 
 	indexInLockFile, binaryFoundInLockFile := stew.FindBinaryInLockFile(lockFile, binaryName)

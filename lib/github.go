@@ -53,6 +53,27 @@ func getGithubJSON(owner, repo string) (string, error) {
 	return response, nil
 }
 
+type githubRepoAPIResponse struct {
+	Description string `json:"description"`
+}
+
+// GetGithubRepoDescription returns the GitHub repo description, or an empty string if it is unavailable
+func GetGithubRepoDescription(owner, repo string) string {
+	url := fmt.Sprintf("https://api.github.com/repos/%v/%v", owner, repo)
+
+	response, err := getHTTPResponseBody(url)
+	if err != nil {
+		return ""
+	}
+
+	var repoAPIResponse githubRepoAPIResponse
+	if err := json.Unmarshal([]byte(response), &repoAPIResponse); err != nil {
+		return ""
+	}
+
+	return repoAPIResponse.Description
+}
+
 // NewGithubProject creates a new instance of the GithubProject struct
 func NewGithubProject(owner, repo string) (GithubProject, error) {
 	if owner == constants.StewOwner && repo == constants.StewRepo {

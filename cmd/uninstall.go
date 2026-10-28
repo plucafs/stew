@@ -35,6 +35,7 @@ func Uninstall(cliFlag bool, binaryName string) {
 		for _, pkg := range lockFile.Packages {
 			err = stew.DeleteAssetAndBinary(stewPkgPath, stewBinPath, pkg.Asset, pkg.Binary)
 			stew.CatchAndExit(err)
+			deleteDesktopFile(pkg.DesktopFile)
 		}
 		lockFile.Packages = []stew.PackageData{}
 	} else {
@@ -43,6 +44,7 @@ func Uninstall(cliFlag bool, binaryName string) {
 			if pkg.Binary == binaryName {
 				err = stew.DeleteAssetAndBinary(stewPkgPath, stewBinPath, pkg.Asset, pkg.Binary)
 				stew.CatchAndExit(err)
+				deleteDesktopFile(pkg.DesktopFile)
 				lockFile.Packages, err = stew.RemovePackage(lockFile.Packages, index)
 				stew.CatchAndExit(err)
 				binaryFound = true
@@ -60,5 +62,14 @@ func Uninstall(cliFlag bool, binaryName string) {
 		fmt.Printf("✨ Successfully uninstalled all binaries from %v\n", constants.GreenColor(stewBinPath))
 	} else {
 		fmt.Printf("✨ Successfully uninstalled the %v binary from %v\n", constants.GreenColor(binaryName), constants.GreenColor(stewBinPath))
+	}
+}
+
+func deleteDesktopFile(desktopFileName string) {
+	if desktopFileName == "" {
+		return
+	}
+	if err := stew.DeleteDesktopFile(desktopFileName); err != nil {
+		fmt.Printf("%v Could not delete the desktop file %v: %v\n", constants.YellowColor("WARNING:"), constants.YellowColor(desktopFileName), err)
 	}
 }
